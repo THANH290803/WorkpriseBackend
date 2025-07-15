@@ -38,8 +38,20 @@ const options = {
         description: 'Xác thực người dùng',
       },
       {
+        name: 'Roles',
+        description: 'Quản lý vai trò',
+      },
+      {
         name: 'Users',
         description: 'Quản lý người dùng',
+      },
+      {
+        name: 'Departments',
+        description: 'Quản lý phòng ban',
+      },
+      {
+        name: 'Teams',
+        description: 'Quản lý nhóm',
       },
     ],
   },

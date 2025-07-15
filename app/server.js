@@ -5,14 +5,26 @@ require('dotenv').config();
 const app = express();
 
 const userRoutes = require('./routes/userRoutes');
+const roleRoutes = require('./routes/roleRoutes');
+const departmentRoutes = require('./routes/departmentRoutes');
+const teamRoutes = require('./routes/teamRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger/swaggerConfig');
 
 app.use(cors()); 
 app.use(express.json());
 
-// Route API
+// Route API users
 app.use('/api/users', userRoutes);
+
+// Route API role
+app.use('/api/roles', roleRoutes);
+
+// Route API department
+app.use('/api/departments', departmentRoutes);
+
+// Route API team
+app.use('/api/teams', teamRoutes);
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
