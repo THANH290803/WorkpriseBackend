@@ -18,25 +18,34 @@ const departmentController = {
 
     create: (req, res) => {
         const { name, email, head_of_department } = req.body;
-
         if (!name) return res.status(400).json({ message: 'Tên phòng ban là bắt buộc' });
+        if (!head_of_department) return res.status(400).json({ message: 'Phải chọn trưởng phòng' });
 
-        Department.checkDuplicate({ name, email, head_of_department }, null, (err, results) => {
+        Department.checkIsManager(head_of_department, (err, isManager) => {
             if (err) return res.status(500).json({ error: err.message });
+            if (!isManager.length) return res.status(400).json({ message: 'Người này không có vai trò Trưởng phòng' });
 
-            if (results.length > 0) {
-                const errors = [];
-                results.forEach(item => {
-                    if (item.name === name) errors.push('Tên đã tồn tại');
-                    if (item.email === email) errors.push('Email đã tồn tại');
-                    if (item.head_of_department === head_of_department) errors.push('Người này đã là trưởng phòng khác');
-                });
-                return res.status(400).json({ message: errors.join(', ') });
-            }
-
-            Department.create(req.body, (err, result) => {
+            Department.checkDuplicate({ name, email, head_of_department }, null, (err, results) => {
                 if (err) return res.status(500).json({ error: err.message });
-                res.status(201).json({ message: 'Tạo phòng ban thành công', id: result.insertId });
+
+                if (results.length > 0) {
+                    const errors = [];
+                    results.forEach(item => {
+                        if (item.name === name) errors.push('Tên đã tồn tại');
+                        if (item.email === email) errors.push('Email đã tồn tại');
+                        if (item.head_of_department === head_of_department) errors.push('Người này đã là trưởng phòng khác');
+                    });
+                    return res.status(400).json({ message: errors.join(', ') });
+                }
+
+                Department.create(req.body, (err, result) => {
+                    if (err) return res.status(500).json({ error: err.message });
+
+                    Department.updateUserRole(head_of_department, (err) => {
+                        if (err) return res.status(500).json({ error: err.message });
+                        res.status(201).json({ message: 'Tạo phòng ban thành công và đã gán trưởng phòng' });
+                    });
+                });
             });
         });
     },
@@ -46,23 +55,33 @@ const departmentController = {
         const { name, email, head_of_department } = req.body;
 
         if (!name) return res.status(400).json({ message: 'Tên phòng ban là bắt buộc' });
+        if (!head_of_department) return res.status(400).json({ message: 'Phải chọn trưởng phòng' });
 
-        Department.checkDuplicate({ name, email, head_of_department }, id, (err, results) => {
+        Department.checkIsManager(head_of_department, (err, isManager) => {
             if (err) return res.status(500).json({ error: err.message });
+            if (!isManager.length) return res.status(400).json({ message: 'Người này không có vai trò Trưởng phòng' });
 
-            if (results.length > 0) {
-                const errors = [];
-                results.forEach(item => {
-                    if (item.name === name) errors.push('Tên đã tồn tại');
-                    if (item.email === email) errors.push('Email đã tồn tại');
-                    if (item.head_of_department === head_of_department) errors.push('Người này đã là trưởng phòng khác');
-                });
-                return res.status(400).json({ message: errors.join(', ') });
-            }
-
-            Department.update(id, req.body, (err) => {
+            Department.checkDuplicate({ name, email, head_of_department }, id, (err, results) => {
                 if (err) return res.status(500).json({ error: err.message });
-                res.json({ message: 'Cập nhật phòng ban thành công' });
+
+                if (results.length > 0) {
+                    const errors = [];
+                    results.forEach(item => {
+                        if (item.name === name) errors.push('Tên đã tồn tại');
+                        if (item.email === email) errors.push('Email đã tồn tại');
+                        if (item.head_of_department === head_of_department) errors.push('Người này đã là trưởng phòng khác');
+                    });
+                    return res.status(400).json({ message: errors.join(', ') });
+                }
+
+                Department.update(id, req.body, (err) => {
+                    if (err) return res.status(500).json({ error: err.message });
+
+                    Department.updateUserRole(head_of_department, (err) => {
+                        if (err) return res.status(500).json({ error: err.message });
+                        res.json({ message: 'Cập nhật phòng ban thành công và gán trưởng phòng' });
+                    });
+                });
             });
         });
     },

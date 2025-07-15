@@ -71,15 +71,32 @@ const Department = {
             SELECT * FROM departments 
             WHERE (name = ? OR email = ? OR head_of_department = ?)
         `;
-
         const values = [name, email, head_of_department];
-
         if (excludeId) {
             sql += ` AND id != ?`;
             values.push(excludeId);
         }
-
         db.query(sql, values, callback);
+    },
+
+    checkIsManager: (userId, callback) => {
+        const sql = `
+            SELECT u.id FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.id = ? AND r.name = 'Trưởng phòng'
+        `;
+        db.query(sql, [userId], callback);
+    },
+
+    updateUserRole: (userId, callback) => {
+        const getRoleQuery = `SELECT id FROM roles WHERE name = 'Trưởng phòng' LIMIT 1`;
+        db.query(getRoleQuery, (err, results) => {
+            if (err) return callback(err);
+            if (!results.length) return callback(new Error('Không tìm thấy vai trò Trưởng phòng'));
+            const roleId = results[0].id;
+            const updateQuery = `UPDATE users SET role_id = ? WHERE id = ?`;
+            db.query(updateQuery, [roleId, userId], callback);
+        });
     }
 };
 

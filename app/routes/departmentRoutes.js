@@ -20,21 +20,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Danh sách phòng ban
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id: { type: integer }
- *                   name: { type: string }
- *                   address: { type: string, nullable: true }
- *                   email: { type: string, nullable: true }
- *                   description: { type: string, nullable: true }
- *                   date_of_establishment: { type: string, format: date, nullable: true }
- *                   head_of_department: { type: integer, nullable: true }
+ *         description: Thành công
  */
 router.get('/', authMiddleware, departmentController.getAll);
 
@@ -47,29 +33,14 @@ router.get('/', authMiddleware, departmentController.getAll);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: id
- *         in: path
- *         description: ID phòng ban
- *         required: true
+ *       - in: path
+ *         name: id
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
- *         description: Thông tin phòng ban
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id: { type: integer }
- *                 name: { type: string }
- *                 address: { type: string, nullable: true }
- *                 email: { type: string, nullable: true }
- *                 description: { type: string, nullable: true }
- *                 date_of_establishment: { type: string, format: date, nullable: true }
- *                 head_of_department: { type: integer, nullable: true }
- *       404:
- *         description: Không tìm thấy
+ *         description: Thành công
  */
 router.get('/:id', authMiddleware, departmentController.getById);
 
@@ -89,16 +60,24 @@ router.get('/:id', authMiddleware, departmentController.getById);
  *             type: object
  *             required:
  *               - name
+ *               - head_of_department
  *             properties:
- *               name: { type: string }
- *               address: { type: string, nullable: true }
- *               email: { type: string, nullable: true }
- *               description: { type: string, nullable: true }
- *               date_of_establishment: { type: string, format: date, nullable: true }
- *               head_of_department: { type: integer, nullable: true }
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               date_of_establishment:
+ *                 type: string
+ *                 format: date
+ *               head_of_department:
+ *                 type: integer
  *     responses:
  *       201:
- *         description: Tạo thành công
+ *         description: Đã tạo thành công
  */
 router.post('/', authMiddleware, departmentController.create);
 
@@ -111,30 +90,33 @@ router.post('/', authMiddleware, departmentController.create);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: id
- *         in: path
- *         description: ID phòng ban
- *         required: true
+ *       - in: path
+ *         name: id
  *         schema:
  *           type: integer
+ *         required: true
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
  *             properties:
- *               name: { type: string }
- *               address: { type: string, nullable: true }
- *               email: { type: string, nullable: true }
- *               description: { type: string, nullable: true }
- *               date_of_establishment: { type: string, format: date, nullable: true }
- *               head_of_department: { type: integer, nullable: true }
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               date_of_establishment:
+ *                 type: string
+ *                 format: date
+ *               head_of_department:
+ *                 type: integer
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Đã cập nhật
  */
 router.put('/:id', authMiddleware, departmentController.update);
 
@@ -147,15 +129,14 @@ router.put('/:id', authMiddleware, departmentController.update);
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: id
- *         in: path
- *         description: ID phòng ban
- *         required: true
+ *       - in: path
+ *         name: id
  *         schema:
  *           type: integer
+ *         required: true
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Đã xóa
  */
 router.delete('/:id', authMiddleware, departmentController.delete);
 

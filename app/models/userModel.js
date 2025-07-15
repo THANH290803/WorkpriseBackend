@@ -122,41 +122,56 @@ const User = {
         callback
     ) => {
         try {
-            if (!isStrongPassword(password)) {
-                return callback(
-                    {
-                        message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
-                    },
-                    null
-                );
-            }
+            // 1. Kiểm tra trùng name/email/phone_number
+            const checkDuplicateQuery = `
+            SELECT * FROM users 
+            WHERE name = ? OR email = ? OR phone_number = ?
+        `;
+            db.query(checkDuplicateQuery, [name, email, phone_number], async (err, dupResults) => {
+                if (err) return callback(err, null);
+                if (dupResults.length > 0) {
+                    return callback({ message: 'Tên, email hoặc số điện thoại đã tồn tại' }, null);
+                }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const sql = `
-      INSERT INTO users 
-      (name, email, password, phone_number, address, avatar, description, skill, certificate, status, role_id, department_id, team_id) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-            const values = [
-                name,
-                email,
-                hashedPassword,
-                phone_number,
-                address,
-                avatar,
-                description,
-                skill,
-                certificate,
-                status,
-                role_id,
-                department_id,
-                team_id
-            ];
-            db.query(sql, values, callback);
+                // 2. Kiểm tra password mạnh
+                if (!isStrongPassword(password)) {
+                    return callback(
+                        {
+                            message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
+                        },
+                        null
+                    );
+                }
+
+                // 3. Hash mật khẩu và insert
+                const hashedPassword = await bcrypt.hash(password, 10);
+                const sql = `
+                INSERT INTO users 
+                (name, email, password, phone_number, address, avatar, description, skill, certificate, status, role_id, department_id, team_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+                const values = [
+                    name,
+                    email,
+                    hashedPassword,
+                    phone_number,
+                    address,
+                    avatar,
+                    description,
+                    skill,
+                    certificate,
+                    status,
+                    role_id,
+                    department_id,
+                    team_id
+                ];
+                db.query(sql, values, callback);
+            });
         } catch (err) {
             callback(err, null);
         }
     },
+
 
     update: async (
         id,
@@ -178,38 +193,67 @@ const User = {
         callback
     ) => {
         try {
-            if (!isStrongPassword(password)) {
-                return callback(
-                    {
-                        message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
-                    },
-                    null
-                );
-            }
+            // 1. Kiểm tra trùng name/email/phone
+            const checkDuplicateQuery = `
+                SELECT * FROM users 
+                WHERE (name = ? OR email = ? OR phone_number = ?) AND id != ?
+            `;
+            db.query(checkDuplicateQuery, [name, email, phone_number, id], async (err, dupResults) => {
+                if (err) return callback(err, null);
+                if (dupResults.length > 0) {
+                    return callback({ message: 'Tên, email hoặc số điện thoại đã tồn tại' }, null);
+                }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const sql = `
-      UPDATE users 
-      SET name = ?, email = ?, password = ?, phone_number = ?, address = ?, avatar = ?, description = ?, skill = ?, certificate = ?, status = ?, role_id = ?, department_id = ?, team_id = ?
-      WHERE id = ?
-    `;
-            const values = [
-                name,
-                email,
-                hashedPassword,
-                phone_number,
-                address,
-                avatar,
-                description,
-                skill,
-                certificate,
-                status,
-                role_id,
-                department_id,
-                team_id,
-                id
-            ];
-            db.query(sql, values, callback);
+                // 2. Lấy password cũ nếu không nhập mới
+                let hashedPassword;
+                if (password) {
+                    if (!isStrongPassword(password)) {
+                        return callback(
+                            {
+                                message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
+                            },
+                            null
+                        );
+                    }
+                    hashedPassword = await bcrypt.hash(password, 10);
+                    proceedUpdate();
+                } else {
+                    const getPasswordQuery = 'SELECT password FROM users WHERE id = ?';
+                    db.query(getPasswordQuery, [id], (err, result) => {
+                        if (err || result.length === 0)
+                            return callback({ message: 'Không tìm thấy người dùng' }, null);
+                        hashedPassword = result[0].password;
+                        proceedUpdate();
+                    });
+                }
+
+                function proceedUpdate() {
+                    const sql = `
+                        UPDATE users 
+                        SET name = ?, email = ?, password = ?, phone_number = ?, address = ?, avatar = ?, 
+                            description = ?, skill = ?, certificate = ?, status = ?, role_id = ?, 
+                            department_id = ?, team_id = ?
+                        WHERE id = ?
+                    `;
+                    const values = [
+                        name,
+                        email,
+                        hashedPassword,
+                        phone_number,
+                        address,
+                        avatar,
+                        description,
+                        skill,
+                        certificate,
+                        status,
+                        role_id,
+                        department_id,
+                        team_id,
+                        id
+                    ];
+                    db.query(sql, values, callback);
+                }
+            });
         } catch (err) {
             callback(err, null);
         }
