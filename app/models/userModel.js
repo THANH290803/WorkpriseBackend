@@ -103,35 +103,118 @@ const User = {
         db.query(query, [id], callback);
     },
 
-    create: async ({ name, email, password, phone_number, address, avatar }, callback) => {
+    create: async (
+        {
+            name,
+            email,
+            password,
+            phone_number,
+            address,
+            avatar,
+            description,
+            skill,
+            certificate,
+            status,
+            role_id,
+            department_id,
+            team_id
+        },
+        callback
+    ) => {
         try {
             if (!isStrongPassword(password)) {
-                return callback({ message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.' }, null);
+                return callback(
+                    {
+                        message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
+                    },
+                    null
+                );
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
-            const sql = 'INSERT INTO users (name, email, password, phone_number, address, avatar) VALUES (?, ?, ?, ?, ?, ?)';
-            const values = [name, email, hashedPassword, phone_number, address, avatar];
+            const sql = `
+      INSERT INTO users 
+      (name, email, password, phone_number, address, avatar, description, skill, certificate, status, role_id, department_id, team_id) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+            const values = [
+                name,
+                email,
+                hashedPassword,
+                phone_number,
+                address,
+                avatar,
+                description,
+                skill,
+                certificate,
+                status,
+                role_id,
+                department_id,
+                team_id
+            ];
             db.query(sql, values, callback);
         } catch (err) {
             callback(err, null);
         }
     },
 
-    update: async (id, { name, email, password, phone_number, address, avatar }, callback) => {
+    update: async (
+        id,
+        {
+            name,
+            email,
+            password,
+            phone_number,
+            address,
+            avatar,
+            description,
+            skill,
+            certificate,
+            status,
+            role_id,
+            department_id,
+            team_id
+        },
+        callback
+    ) => {
         try {
             if (!isStrongPassword(password)) {
-                return callback({ message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.' }, null);
+                return callback(
+                    {
+                        message: 'Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.'
+                    },
+                    null
+                );
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
-            const sql = 'UPDATE users SET name = ?, email = ?, password = ?, phone_number = ?, address = ?, avatar = ? WHERE id = ?';
-            const values = [name, email, hashedPassword, phone_number, address, avatar, id];
+            const sql = `
+      UPDATE users 
+      SET name = ?, email = ?, password = ?, phone_number = ?, address = ?, avatar = ?, description = ?, skill = ?, certificate = ?, status = ?, role_id = ?, department_id = ?, team_id = ?
+      WHERE id = ?
+    `;
+            const values = [
+                name,
+                email,
+                hashedPassword,
+                phone_number,
+                address,
+                avatar,
+                description,
+                skill,
+                certificate,
+                status,
+                role_id,
+                department_id,
+                team_id,
+                id
+            ];
             db.query(sql, values, callback);
         } catch (err) {
             callback(err, null);
         }
     },
+
 
     delete: (id, callback) => {
         db.query('DELETE FROM users WHERE id = ?', [id], callback);

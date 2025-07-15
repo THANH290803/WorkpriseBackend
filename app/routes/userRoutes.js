@@ -89,6 +89,7 @@ router.get('/:id', authMiddleware, userController.getUserById);
  *               - name
  *               - email
  *               - password
+ *               - role_id
  *             properties:
  *               name:
  *                 type: string
@@ -102,6 +103,20 @@ router.get('/:id', authMiddleware, userController.getUserById);
  *                 type: string
  *               avatar:
  *                 type: string
+ *               description:
+ *                 type: string
+ *               skill:
+ *                 type: string
+ *               certificate:
+ *                 type: string
+ *               status:
+ *                 type: integer
+ *               role_id:
+ *                 type: integer
+ *               department_id:
+ *                 type: integer
+ *               team_id:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Đã tạo
@@ -141,6 +156,20 @@ router.post('/', authMiddleware, userController.createUser);
  *                 type: string
  *               avatar:
  *                 type: string
+ *               description:
+ *                 type: string
+ *               skill:
+ *                 type: string
+ *               certificate:
+ *                 type: string
+ *               status:
+ *                 type: integer
+ *               role_id:
+ *                 type: integer
+ *               department_id:
+ *                 type: integer
+ *               team_id:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Đã cập nhật
