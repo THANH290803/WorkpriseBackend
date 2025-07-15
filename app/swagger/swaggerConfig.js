@@ -13,6 +13,10 @@ const options = {
         url: 'http://localhost:5001/api',
         description: 'Local Server',
       },
+      {
+        url: 'https://workprisebackend-production.up.railway.app/api',
+        description: 'Production Server (Railway)',
+      },
     ],
     components: {
       securitySchemes: {
