@@ -14,8 +14,8 @@ const options = {
         description: 'Local Server',
       },
       {
-        url: 'https://workprisebackend-production.up.railway.app/api',
-        description: 'Production Server (Railway)',
+        url: 'https://workprise.onrender.com/api',
+        description: 'Production Server (Render)',
       },
     ],
     components: {
