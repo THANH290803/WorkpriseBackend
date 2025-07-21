@@ -7,9 +7,10 @@ const connection = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  connectionLimit: 10,
 });
 
-connection.connect((err) => {
+connection.getConnection((err) => {
   if (err) {
     console.error('❌ Lỗi kết nối MySQL:', err);
   } else {
