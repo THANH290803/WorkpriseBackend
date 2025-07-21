@@ -49,10 +49,6 @@ const options = {
         name: 'Departments',
         description: 'Quản lý phòng ban',
       },
-      {
-        name: 'Teams',
-        description: 'Quản lý nhóm',
-      },
     ],
   },
   apis: ['app/routes/*.js'],

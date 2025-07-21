@@ -19,12 +19,10 @@ const User = {
             u.address,
             u.avatar,
             r.name AS role_name,
-            d.name AS department_name,
-            t.name AS team_name
+            d.name AS department_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         LEFT JOIN departments d ON u.department_id = d.id
-        LEFT JOIN teams t ON u.team_id = t.id
         WHERE u.email = ?
     `;
 
@@ -52,13 +50,11 @@ const User = {
                     address: user.address,
                     avatar: user.avatar,
                     role_name: user.role_name,
-                    department_name: user.department_name,
-                    team_name: user.team_name
+                    department_name: user.department_name
                 }
             });
         });
     },
-
 
     getAll: (callback) => {
         const query = `
@@ -70,12 +66,10 @@ const User = {
             u.address,
             u.avatar,
             r.name AS role_name,
-            d.name AS department_name,
-            t.name AS team_name
+            d.name AS department_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         LEFT JOIN departments d ON u.department_id = d.id
-        LEFT JOIN teams t ON u.team_id = t.id
     `;
         db.query(query, callback);
     },
@@ -91,13 +85,11 @@ const User = {
             u.avatar,
             r.name AS role_name,
             c.name AS company_name,
-            d.name AS department_name,
-            t.name AS team_name
+            d.name AS department_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         LEFT JOIN companies c ON u.company_id = c.id
         LEFT JOIN departments d ON u.department_id = d.id
-        LEFT JOIN teams t ON u.team_id = t.id
         WHERE u.id = ?
     `;
         db.query(query, [id], callback);
@@ -116,13 +108,11 @@ const User = {
             certificate,
             status,
             role_id,
-            department_id,
-            team_id
+            department_id
         },
         callback
     ) => {
         try {
-            // 1. Kiểm tra trùng name/email/phone_number
             const checkDuplicateQuery = `
             SELECT * FROM users 
             WHERE name = ? OR email = ? OR phone_number = ?
@@ -133,7 +123,6 @@ const User = {
                     return callback({ message: 'Tên, email hoặc số điện thoại đã tồn tại' }, null);
                 }
 
-                // 2. Kiểm tra password mạnh
                 if (!isStrongPassword(password)) {
                     return callback(
                         {
@@ -143,12 +132,11 @@ const User = {
                     );
                 }
 
-                // 3. Hash mật khẩu và insert
                 const hashedPassword = await bcrypt.hash(password, 10);
                 const sql = `
                 INSERT INTO users 
-                (name, email, password, phone_number, address, avatar, description, skill, certificate, status, role_id, department_id, team_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (name, email, password, phone_number, address, avatar, description, skill, certificate, status, role_id, department_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
                 const values = [
                     name,
@@ -162,8 +150,7 @@ const User = {
                     certificate,
                     status,
                     role_id,
-                    department_id,
-                    team_id
+                    department_id
                 ];
                 db.query(sql, values, callback);
             });
@@ -171,7 +158,6 @@ const User = {
             callback(err, null);
         }
     },
-
 
     update: async (
         id,
@@ -187,13 +173,11 @@ const User = {
             certificate,
             status,
             role_id,
-            department_id,
-            team_id
+            department_id
         },
         callback
     ) => {
         try {
-            // 1. Kiểm tra trùng name/email/phone
             const checkDuplicateQuery = `
                 SELECT * FROM users 
                 WHERE (name = ? OR email = ? OR phone_number = ?) AND id != ?
@@ -204,7 +188,6 @@ const User = {
                     return callback({ message: 'Tên, email hoặc số điện thoại đã tồn tại' }, null);
                 }
 
-                // 2. Lấy password cũ nếu không nhập mới
                 let hashedPassword;
                 if (password) {
                     if (!isStrongPassword(password)) {
@@ -232,7 +215,7 @@ const User = {
                         UPDATE users 
                         SET name = ?, email = ?, password = ?, phone_number = ?, address = ?, avatar = ?, 
                             description = ?, skill = ?, certificate = ?, status = ?, role_id = ?, 
-                            department_id = ?, team_id = ?
+                            department_id = ?
                         WHERE id = ?
                     `;
                     const values = [
@@ -248,7 +231,6 @@ const User = {
                         status,
                         role_id,
                         department_id,
-                        team_id,
                         id
                     ];
                     db.query(sql, values, callback);
@@ -258,7 +240,6 @@ const User = {
             callback(err, null);
         }
     },
-
 
     delete: (id, callback) => {
         db.query('DELETE FROM users WHERE id = ?', [id], callback);

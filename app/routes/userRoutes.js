@@ -115,8 +115,6 @@ router.get('/:id', authMiddleware, userController.getUserById);
  *                 type: integer
  *               department_id:
  *                 type: integer
- *               team_id:
- *                 type: integer
  *     responses:
  *       201:
  *         description: Đã tạo
@@ -168,13 +166,11 @@ router.post('/', authMiddleware, userController.createUser);
  *                 type: integer
  *               department_id:
  *                 type: integer
- *               team_id:
- *                 type: integer
  *     responses:
  *       200:
  *         description: Đã cập nhật
  */
-router.put('/:id', authMiddleware, userController.updateUser);
+router.patch('/:id', authMiddleware, userController.updateUser);
 
 /**
  * @swagger
