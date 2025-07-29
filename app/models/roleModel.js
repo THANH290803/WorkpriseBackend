@@ -16,9 +16,18 @@ const Role = {
         db.query(sql, [name, description || null], callback);
     },
 
-    update: (id, { name, description }, callback) => {
-        const sql = 'UPDATE roles SET name = ?, description = ? WHERE id = ?';
-        db.query(sql, [name, description || null, id], callback);
+    update: (id, data, callback) => {
+        const keys = Object.keys(data);
+        if (keys.length === 0) {
+            return callback(null, { message: 'Không có trường nào để cập nhật' });
+        }
+
+        const fields = keys.map(key => `${key} = ?`).join(', ');
+        const values = keys.map(key => data[key]);
+        values.push(id); // thêm id vào cuối
+
+        const sql = `UPDATE roles SET ${fields} WHERE id = ?`;
+        db.query(sql, values, callback);
     },
 
     delete: (id, callback) => {

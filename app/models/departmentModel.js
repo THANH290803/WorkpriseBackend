@@ -16,13 +16,12 @@ const Department = {
             email,
             description,
             date_of_establishment,
-            head_of_department
         } = data;
 
         const sql = `
             INSERT INTO departments 
-            (name, address, email, description, date_of_establishment, head_of_department)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (name, address, email, description, date_of_establishment)
+            VALUES (?, ?, ?, ?, ?)
         `;
 
         db.query(sql, [
@@ -30,48 +29,43 @@ const Department = {
             address || null,
             email || null,
             description || null,
-            date_of_establishment || null,
-            head_of_department || null
+            date_of_establishment || null
         ], callback);
     },
 
     update: (id, data, callback) => {
-        const {
-            name,
-            address,
-            email,
-            description,
-            date_of_establishment,
-            head_of_department
-        } = data;
+        const allowedFields = [
+            'name',
+            'address',
+            'email',
+            'description',
+            'date_of_establishment'
+        ];
 
-        const sql = `
-            UPDATE departments 
-            SET name = ?, address = ?, email = ?, description = ?, date_of_establishment = ?, head_of_department = ?
-            WHERE id = ?
-        `;
+        const keys = Object.keys(data).filter(key => allowedFields.includes(key));
+        if (keys.length === 0) {
+            return callback(null, { message: 'Không có trường nào để cập nhật' });
+        }
 
-        db.query(sql, [
-            name,
-            address || null,
-            email || null,
-            description || null,
-            date_of_establishment || null,
-            head_of_department || null,
-            id
-        ], callback);
-    },
+        const fields = keys.map(key => `${key} = ?`).join(', ');
+        const values = keys.map(key => data[key] ?? null); // nếu undefined thì gán null
+        values.push(id);
+
+        const sql = `UPDATE departments SET ${fields} WHERE id = ?`;
+        db.query(sql, values, callback);
+    }
+    ,
 
     delete: (id, callback) => {
         db.query('DELETE FROM departments WHERE id = ?', [id], callback);
     },
 
-    checkDuplicate: ({ name, email, head_of_department }, excludeId = null, callback) => {
+    checkDuplicate: ({ name, email,  }, excludeId = null, callback) => {
         let sql = `
             SELECT * FROM departments 
-            WHERE (name = ? OR email = ? OR head_of_department = ?)
+            WHERE (name = ? OR email = ?)
         `;
-        const values = [name, email, head_of_department];
+        const values = [name, email, ];
         if (excludeId) {
             sql += ` AND id != ?`;
             values.push(excludeId);

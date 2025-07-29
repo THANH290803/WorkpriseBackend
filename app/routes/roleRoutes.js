@@ -103,7 +103,7 @@ router.post('/', authMiddleware, roleController.createRole);
 /**
  * @swagger
  * /roles/{id}:
- *   put:
+ *   patch:
  *     summary: Cập nhật vai trò
  *     tags: [Roles]
  *     security:
@@ -132,7 +132,7 @@ router.post('/', authMiddleware, roleController.createRole);
  *       200:
  *         description: Cập nhật thành công
  */
-router.put('/:id', authMiddleware, roleController.updateRole);
+router.patch('/:id', authMiddleware, roleController.updateRole);
 
 /**
  * @swagger

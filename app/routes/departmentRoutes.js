@@ -73,8 +73,6 @@ router.get('/:id', authMiddleware, departmentController.getById);
  *               date_of_establishment:
  *                 type: string
  *                 format: date
- *               head_of_department:
- *                 type: integer
  *     responses:
  *       201:
  *         description: Đã tạo thành công
@@ -84,7 +82,7 @@ router.post('/', authMiddleware, departmentController.create);
 /**
  * @swagger
  * /departments/{id}:
- *   put:
+ *   patch:
  *     summary: Cập nhật phòng ban
  *     tags: [Departments]
  *     security:
@@ -112,13 +110,11 @@ router.post('/', authMiddleware, departmentController.create);
  *               date_of_establishment:
  *                 type: string
  *                 format: date
- *               head_of_department:
- *                 type: integer
  *     responses:
  *       200:
  *         description: Đã cập nhật
  */
-router.put('/:id', authMiddleware, departmentController.update);
+router.patch('/:id', authMiddleware, departmentController.update);
 
 /**
  * @swagger

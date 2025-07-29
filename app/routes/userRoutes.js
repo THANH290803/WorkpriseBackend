@@ -29,8 +29,10 @@ const authMiddleware = require('../middlewares/authMiddleware');
  *             properties:
  *               email:
  *                 type: string
+ *                 example: admin@gmail.com
  *               password:
  *                 type: string
+ *                 example: Admin@123
  *     responses:
  *       200:
  *         description: Đăng nhập thành công và trả về token
@@ -124,7 +126,7 @@ router.post('/', authMiddleware, userController.createUser);
 /**
  * @swagger
  * /users/{id}:
- *   put:
+ *   patch:
  *     summary: Cập nhật người dùng
  *     tags: [Users]
  *     security:

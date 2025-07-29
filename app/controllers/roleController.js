@@ -29,15 +29,24 @@ const roleController = {
 
     updateRole: (req, res) => {
         const id = req.params.id;
-        const { name, description } = req.body;
+        const data = req.body;
 
-        if (!name) return res.status(400).json({ message: 'Tên role là bắt buộc' });
+        // Nếu có gửi name, thì bắt buộc không được rỗng
+        if (data.hasOwnProperty('name') && data.name === '') {
+            return res.status(400).json({ message: 'Tên role là bắt buộc' });
+        }
 
-        Role.update(id, { name, description }, (err, result) => {
+        // Nếu không gửi gì cả
+        if (Object.keys(data).length === 0) {
+            return res.status(400).json({ message: 'Không có dữ liệu để cập nhật' });
+        }
+
+        Role.update(id, data, (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'Cập nhật role thành công' });
         });
     },
+
 
     deleteRole: (req, res) => {
         const id = req.params.id;
